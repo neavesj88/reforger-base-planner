@@ -217,7 +217,7 @@ const CONFIG = {
     relay:  { name: 'Relay',  max: Infinity, build: false, radio: true  }
   },
   defaults: {                                      // metres — editable in Settings
-    mobRadio: 2500,                                // estimate (not published by BI)
+    mobRadio: 1000,                                // estimate (not published by BI) — kept ≤ relay so relays stay the wide beacons
     baseRadio: 1000,                               // community-sourced
     relayRadio: 2000,                              // community-sourced ("additional 2000 m")
     mobBuild: 750, baseBuild: 750,                 // estimates

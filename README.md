@@ -33,7 +33,7 @@ so every radius is editable in the ⚙ Settings drawer:
 |---|---|---|
 | Base radio range | 1,000 m | community guides |
 | Relay radio range | 2,000 m | community guides ("additional 2000 m of radio coverage") |
-| MOB radio range | 2,500 m | **estimate** — not published |
+| MOB radio range | 1,000 m | **estimate** — not published |
 | MOB / base build radius | 750 m | **estimate** — not published |
 | Supply base build radius | 300 m | **estimate** — no published figure at all |
 
