@@ -32,6 +32,7 @@ header h1 small{color:var(--muted);font-weight:600}
 .tbtn .dot{width:12px;height:12px;border-radius:50%;flex:none}
 .tbtn .dot.mob{border-radius:3px;background:#e8a21d}
 .tbtn .dot.point{background:#3f8ecc}
+.tbtn .dot.supply{border-radius:4px;background:#a0662c}
 .tbtn .dot.relay{background:#5a7d2a}
 .spacer{flex:1}
 
@@ -53,6 +54,7 @@ header h1 small{color:var(--muted);font-weight:600}
 .token.point .body{width:20px;height:20px;border-radius:50%;background:#3f8ecc;
   box-shadow:0 0 0 2px #fff inset,0 1px 5px rgba(0,0,0,.5)}
 .token.relay .body{width:26px;height:26px;border-radius:50%;background:#42591e;font-size:14px}
+.token.supply .body{width:24px;height:24px;border-radius:6px;background:#a0662c;font-size:13px}
 .token .name{font-size:11px;font-weight:700;color:#10161d;background:rgba(255,255,255,.82);
   padding:1px 6px;border-radius:6px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
 .token.sel .body{outline:3px solid #fff;outline-offset:1px}
@@ -87,8 +89,9 @@ body.nolabels .token .name{display:none}
 #drawer h2{font-size:14px;margin:4px 0 10px}
 #drawer h3{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 8px}
 .field{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:7px 0;font-size:13px}
-.field input[type=number]{width:90px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+.field input[type=number]{width:78px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
   border-radius:8px;padding:6px 8px;font-size:13px;text-align:right}
+.field .ctl{display:flex;gap:8px;align-items:center;flex:none}
 .field input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
 #drawer .tbtn{width:100%;justify-content:center;margin:4px 0}
 #drawer .note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}
@@ -118,9 +121,10 @@ body.nolabels .token .name{display:none}
 <header>
   <h1>EVERON <small>· Base Placement</small></h1>
   <div class="toolgrp" role="toolbar" aria-label="Tools">
-    <button class="tbtn active" id="toolPan" data-tool="pan" title="Pan / select">✥ Pan</button>
+    <button class="tbtn active" id="toolPan" data-tool="pan" title="Default mode — drag the map to move around, drag a marker to reposition it, tap a marker to rename or delete">☝ Select</button>
     <button class="tbtn" id="toolMob" data-tool="mob" title="Place a Main Operating Base (max 2)"><span class="dot mob"></span>MOB</button>
     <button class="tbtn" data-tool="point" title="Place a base / objective"><span class="dot point"></span>Base</button>
+    <button class="tbtn" data-tool="supply" title="Place a supply base"><span class="dot supply"></span>Supply</button>
     <button class="tbtn" data-tool="relay" title="Place a radio relay"><span class="dot relay"></span>Relay</button>
     <button class="tbtn" data-tool="measure" title="Measure distance">📏 Measure</button>
   </div>
@@ -158,14 +162,15 @@ body.nolabels .token .name{display:none}
 <div class="scrim" id="scrimDrawer"></div>
 <div id="drawer" aria-label="Settings" role="dialog">
   <h2>⚙ Ranges &amp; options</h2>
-  <h3>Radio coverage (m)</h3>
-  <div class="field"><label for="setMobRadio">MOB radio range</label><input type="number" id="setMobRadio" min="0" step="100"></div>
-  <div class="field"><label for="setBaseRadio">Base radio range</label><input type="number" id="setBaseRadio" min="0" step="100"></div>
-  <div class="field"><label for="setRelayRadio">Relay radio range</label><input type="number" id="setRelayRadio" min="0" step="100"></div>
-  <h3>Build zone (m)</h3>
-  <div class="field"><label for="setBuild">Build radius (MOB &amp; bases)</label><input type="number" id="setBuild" min="0" step="50"></div>
+  <h3>Radio coverage (m · tick shows circle)</h3>
+  <div class="field"><label for="setMobRadio">MOB radio</label><span class="ctl"><input type="number" id="setMobRadio" min="0" step="100"><input type="checkbox" id="setShowRadioMob" title="Show MOB radio circles"></span></div>
+  <div class="field"><label for="setBaseRadio">Base radio</label><span class="ctl"><input type="number" id="setBaseRadio" min="0" step="100"><input type="checkbox" id="setShowRadioBase" title="Show base radio circles"></span></div>
+  <div class="field"><label for="setRelayRadio">Relay radio</label><span class="ctl"><input type="number" id="setRelayRadio" min="0" step="100"><input type="checkbox" id="setShowRadioRelay" title="Show relay radio circles"></span></div>
+  <h3>Build zone radius (m)</h3>
+  <div class="field"><label for="setMobBuild">MOB build radius</label><input type="number" id="setMobBuild" min="0" step="50"></div>
+  <div class="field"><label for="setBaseBuild">Base build radius</label><input type="number" id="setBaseBuild" min="0" step="50"></div>
+  <div class="field"><label for="setSupplyBuild">Supply build radius</label><input type="number" id="setSupplyBuild" min="0" step="50"></div>
   <h3>Display</h3>
-  <div class="field"><label for="setShowRadio">Radio circles</label><input type="checkbox" id="setShowRadio"></div>
   <div class="field"><label for="setShowBuild">Build circles</label><input type="checkbox" id="setShowBuild"></div>
   <div class="field"><label for="setShowGrid">1 km grid</label><input type="checkbox" id="setShowGrid"></div>
   <div class="field"><label for="setShowLabels">Marker labels</label><input type="checkbox" id="setShowLabels"></div>
@@ -174,11 +179,14 @@ body.nolabels .token .name{display:none}
   <button class="tbtn" id="btnJsonOut">⇩ Export plan (JSON)</button>
   <button class="tbtn" id="btnJsonIn">⇧ Import plan (JSON)</button>
   <input type="file" id="fileJson" accept=".json,application/json" hidden>
+  <button class="tbtn" id="btnResetSet">↺ Reset settings to defaults</button>
   <button class="tbtn danger" id="btnClear">✕ Clear all markers</button>
   <p class="note"><b>Default ranges</b> — community-sourced for Conflict: base radio ≈ 1,000 m,
-    radio relay ≈ +2,000 m coverage. The <b>MOB range and build radius are estimates</b> — Bohemia
-    doesn't publish them and they vary by game version and server config, so adjust the numbers
-    above to match your server. Circle sizes update live.</p>
+    radio relay ≈ +2,000 m coverage. The <b>MOB range, build radii and supply radius are
+    estimates</b> — Bohemia doesn't publish them and they vary by game version and server
+    config, so adjust the numbers above to match your server. Circle sizes update live.</p>
+  <p class="note"><b>Settings save automatically</b> in this browser (including on a downloaded
+    copy of this file) and travel inside exported JSON plans. ↺ Reset restores the defaults.</p>
   <p class="note">Map: Everon (12.8 × 12.8 km terrain, rendered area 13.6 × 13.1 km, 100 m grid).
     Everything is stored locally in your browser — nothing is uploaded.</p>
 </div>
@@ -203,16 +211,19 @@ body.nolabels .token .name{display:none}
 const CONFIG = {
   map: { widthM: 13600, heightM: 13100 },          // rendered map area covered by the image
   types: {
-    mob:   { name: 'MOB',   max: 2,        build: true  },
-    point: { name: 'Base',  max: Infinity, build: true  },
-    relay: { name: 'Relay', max: Infinity, build: false }
+    mob:    { name: 'MOB',    max: 2,        build: true,  radio: true  },
+    point:  { name: 'Base',   max: Infinity, build: true,  radio: true  },
+    supply: { name: 'Supply', max: Infinity, build: true,  radio: false },
+    relay:  { name: 'Relay',  max: Infinity, build: false, radio: true  }
   },
   defaults: {                                      // metres — editable in Settings
     mobRadio: 2500,                                // estimate (not published by BI)
     baseRadio: 1000,                               // community-sourced
     relayRadio: 2000,                              // community-sourced ("additional 2000 m")
-    buildRadius: 750,                              // estimate
-    showRadio: true, showBuild: true, showGrid: false, showLabels: true
+    mobBuild: 750, baseBuild: 750,                 // estimates
+    supplyBuild: 300,                              // estimate — no published figure at all
+    showRadioMob: true, showRadioBase: true, showRadioRelay: true,
+    showBuild: true, showGrid: false, showLabels: true
   },
   zoomMax: 6, relayGlyph: '📡',
   lsPlan: 'rbp_plan', lsPrefs: 'rbp_prefs'
@@ -228,7 +239,7 @@ const SVGNS = 'http://www.w3.org/2000/svg';
 let markers = [];                                  // {id, type, x, y (metres from NW corner), name}
 let settings = Object.assign({}, CONFIG.defaults);
 let view = { tx: 0, ty: 0, s: 0.1 };               // world CSS transform
-let tool = 'pan', selId = null, nextId = 1, nextBaseNum = 1;
+let tool = 'pan', selId = null, nextId = 1, nextBaseNum = 1, nextSupplyNum = 1;
 let imgW = 0, imgH = 0, m2px = 1;                  // set once the map loads
 
 /* metre <-> image-pixel <-> screen transforms */
@@ -282,8 +293,14 @@ function drawScalebar(){
    touch the nodes that moved.
    ========================================================================= */
 function radiusFor(mk){
-  return { radio: mk.type === 'mob' ? settings.mobRadio : mk.type === 'relay' ? settings.relayRadio : settings.baseRadio,
-           build: CONFIG.types[mk.type].build ? settings.buildRadius : 0 };
+  const radio = mk.type === 'mob' ? settings.mobRadio : mk.type === 'relay' ? settings.relayRadio :
+                mk.type === 'point' ? settings.baseRadio : 0;
+  const build = mk.type === 'mob' ? settings.mobBuild : mk.type === 'point' ? settings.baseBuild :
+                mk.type === 'supply' ? settings.supplyBuild : 0;
+  return { radio, build };
+}
+function radioShown(type){
+  return type === 'mob' ? settings.showRadioMob : type === 'relay' ? settings.showRadioRelay : settings.showRadioBase;
 }
 function makeCircle(cls, fill, edge){
   const c = document.createElementNS(SVGNS, 'circle');
@@ -295,14 +312,14 @@ function makeCircle(cls, fill, edge){
 function buildMarkerNodes(mk){
   const g = document.createElementNS(SVGNS, 'g');
   g.dataset.id = mk.id;
-  g.appendChild(makeCircle('radio', 'var(--radio-fill)', 'var(--radio-edge)'));
+  if (CONFIG.types[mk.type].radio) g.appendChild(makeCircle('radio', 'var(--radio-fill)', 'var(--radio-edge)'));
   if (CONFIG.types[mk.type].build) g.appendChild(makeCircle('build', 'var(--build-fill)', 'var(--build-edge)'));
   ringsG.appendChild(g);
 
   const t = document.createElement('div');
   t.className = 'token ' + mk.type;
   t.dataset.id = mk.id;
-  t.innerHTML = `<div class="body">${mk.type === 'mob' ? 'MOB' : mk.type === 'relay' ? CONFIG.relayGlyph : ''}</div><div class="name"></div>`;
+  t.innerHTML = `<div class="body">${mk.type === 'mob' ? 'MOB' : mk.type === 'relay' ? CONFIG.relayGlyph : mk.type === 'supply' ? '📦' : ''}</div><div class="name"></div>`;
   tokensDiv.appendChild(t);
 }
 function updateMarker(mk){
@@ -313,7 +330,7 @@ function updateMarker(mk){
     c.setAttribute('cx', cx); c.setAttribute('cy', cy);
     const isRadio = c.classList.contains('radio');
     c.setAttribute('r', mx2px(isRadio ? r.radio : r.build));
-    c.style.display = (isRadio ? settings.showRadio && r.radio > 0 : settings.showBuild && r.build > 0) ? '' : 'none';
+    c.style.display = (isRadio ? radioShown(mk.type) && r.radio > 0 : settings.showBuild && r.build > 0) ? '' : 'none';
   }
   t.style.left = cx + 'px'; t.style.top = cy + 'px';
   const nameEl = t.querySelector('.name');
@@ -359,7 +376,8 @@ function addMarker(type, x, y){
   x = Math.min(Math.max(x, 0), CONFIG.map.widthM);
   y = Math.min(Math.max(y, 0), CONFIG.map.heightM);
   const mk = { id: nextId++, type, x, y,
-    name: type === 'mob' ? 'MOB' : type === 'relay' ? 'Relay' : 'Base ' + nextBaseNum++ };
+    name: type === 'mob' ? 'MOB' : type === 'relay' ? 'Relay' :
+          type === 'supply' ? 'Supply ' + nextSupplyNum++ : 'Base ' + nextBaseNum++ };
   markers.push(mk);
   buildMarkerNodes(mk); updateMarker(mk);
   checkSpacing(mk);
@@ -375,9 +393,10 @@ function deleteMarker(id){
 }
 function distM(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
 function checkSpacing(mk){
-  if (!CONFIG.types[mk.type].build || settings.buildRadius <= 0) return;
-  const clash = markers.find(o => o.id !== mk.id && CONFIG.types[o.type].build &&
-                                  distM(o, mk) < settings.buildRadius * 2);
+  const rm = radiusFor(mk).build;
+  if (rm <= 0) return;
+  const clash = markers.find(o => o.id !== mk.id && radiusFor(o).build > 0 &&
+                                  distM(o, mk) < rm + radiusFor(o).build);
   if (clash) toast(`⚠ Build zones overlap: ${mk.name} ↔ ${clash.name} (${Math.round(distM(clash, mk))} m apart)`, true);
 }
 
@@ -500,6 +519,7 @@ function setTool(t){
   if (t !== 'measure'){ measure = null; drawMeasure(); }
   if (t === 'mob') toast('Tap the map to place a MOB (max 2)');
   else if (t === 'point') toast('Tap the map to place bases — Esc when done');
+  else if (t === 'supply') toast('Tap the map to place supply bases — Esc when done');
   else if (t === 'relay') toast('Tap the map to place radio relays — Esc when done');
   else if (t === 'measure') toast('Drag on the map to measure');
 }
@@ -509,9 +529,10 @@ function selectMarker(mk, sx, sy){
   selId = mk.id; updateMarker(mk);
   const pop = $('#popup');
   $('#popName').value = mk.name;
-  const r = radiusFor(mk);
-  $('#popMeta').textContent = `${CONFIG.types[mk.type].name} · radio ${r.radio.toLocaleString()} m` +
-                              (r.build ? ` · build ${r.build.toLocaleString()} m` : '');
+  const r = radiusFor(mk), bits = [];
+  if (r.radio) bits.push(`radio ${r.radio.toLocaleString()} m`);
+  if (r.build) bits.push(`build ${r.build.toLocaleString()} m`);
+  $('#popMeta').textContent = [CONFIG.types[mk.type].name, ...bits].join(' · ');
   pop.classList.add('show');
   pop.style.left = Math.min(Math.max(sx + 14, 8), innerWidth - 236) + 'px';
   pop.style.top  = Math.min(Math.max(sy - 20, 60), innerHeight - 150) + 'px';
@@ -541,8 +562,9 @@ document.addEventListener('keydown', e => {
 
 /* ---------- settings wiring: input id -> settings key ---------- */
 const settingMap = { setMobRadio: 'mobRadio', setBaseRadio: 'baseRadio', setRelayRadio: 'relayRadio',
-                     setBuild: 'buildRadius', setShowRadio: 'showRadio', setShowBuild: 'showBuild',
-                     setShowGrid: 'showGrid', setShowLabels: 'showLabels' };
+                     setMobBuild: 'mobBuild', setBaseBuild: 'baseBuild', setSupplyBuild: 'supplyBuild',
+                     setShowRadioMob: 'showRadioMob', setShowRadioBase: 'showRadioBase', setShowRadioRelay: 'showRadioRelay',
+                     setShowBuild: 'showBuild', setShowGrid: 'showGrid', setShowLabels: 'showLabels' };
 function loadSettingsUI(){
   for (const [id, key] of Object.entries(settingMap)){
     const el = $('#' + id);
@@ -584,15 +606,41 @@ $('#scrimConfirm').addEventListener('click', closeConfirm);
 
 $('#btnClear').addEventListener('click', () =>
   askConfirm('Remove all markers from the map?', 'Clear all', () => {
-    markers = []; nextBaseNum = 1; renderAll(); savePlan(); toast('Plan cleared');
+    markers = []; nextBaseNum = 1; nextSupplyNum = 1; renderAll(); savePlan(); toast('Plan cleared');
   }));
+$('#btnResetSet').addEventListener('click', () => {
+  settings = Object.assign({}, CONFIG.defaults);
+  loadSettingsUI();
+  document.body.classList.toggle('nolabels', !settings.showLabels);
+  drawGrid();
+  for (const mk of markers) updateMarker(mk);
+  savePrefsSoon();
+  toast('Settings reset to defaults');
+});
 
 /* =========================================================================
    PERSISTENCE — plan + prefs autosaved to localStorage (local only).
    ========================================================================= */
 let saveT;
 function savePlan(){
-  localStorage.setItem(CONFIG.lsPlan, JSON.stringify({ v: 1, markers, nextId, nextBaseNum }));
+  localStorage.setItem(CONFIG.lsPlan, JSON.stringify({ v: 1, markers, nextId, nextBaseNum, nextSupplyNum }));
+}
+/* older saves used one shared buildRadius and a single radio toggle — spread them
+   onto the per-type keys so nobody loses their tuned values on upgrade */
+function migrateSettings(s){
+  if (!s) return {};
+  const out = Object.assign({}, s);
+  if ('buildRadius' in out){
+    if (!('mobBuild' in out)) out.mobBuild = out.buildRadius;
+    if (!('baseBuild' in out)) out.baseBuild = out.buildRadius;
+    delete out.buildRadius;
+  }
+  if ('showRadio' in out){
+    for (const k of ['showRadioMob', 'showRadioBase', 'showRadioRelay'])
+      if (!(k in out)) out[k] = out.showRadio;
+    delete out.showRadio;
+  }
+  return out;
 }
 function savePrefsSoon(){
   clearTimeout(saveT);
@@ -601,9 +649,10 @@ function savePrefsSoon(){
 function loadSaved(){
   try{
     const p = JSON.parse(localStorage.getItem(CONFIG.lsPlan) || 'null');
-    if (p && Array.isArray(p.markers)){ markers = p.markers; nextId = p.nextId || markers.length + 1; nextBaseNum = p.nextBaseNum || 1; }
+    if (p && Array.isArray(p.markers)){ markers = p.markers; nextId = p.nextId || markers.length + 1;
+      nextBaseNum = p.nextBaseNum || 1; nextSupplyNum = p.nextSupplyNum || 1; }
     const pr = JSON.parse(localStorage.getItem(CONFIG.lsPrefs) || 'null');
-    if (pr){ Object.assign(settings, pr.settings || {}); if (pr.view && pr.view.s) view = pr.view; return !!pr.view; }
+    if (pr){ Object.assign(settings, migrateSettings(pr.settings)); if (pr.view && pr.view.s) view = pr.view; return !!pr.view; }
   }catch(err){ /* corrupted save — start clean */ }
   return false;
 }
@@ -627,7 +676,8 @@ $('#fileJson').addEventListener('change', e => {
       markers = d.markers.filter(m => CONFIG.types[m.type] && isFinite(m.x) && isFinite(m.y));
       nextId = Math.max(0, ...markers.map(m => m.id)) + 1;
       nextBaseNum = markers.filter(m => m.type === 'point').length + 1;
-      if (d.settings) Object.assign(settings, d.settings);
+      nextSupplyNum = markers.filter(m => m.type === 'supply').length + 1;
+      if (d.settings) Object.assign(settings, migrateSettings(d.settings));
       loadSettingsUI(); renderAll(); savePlan(); savePrefsSoon(); toast('Plan imported');
     }catch(err){ toast('Import failed — not a plan file', true); }
   };
@@ -653,9 +703,10 @@ $('#btnPng').addEventListener('click', () => {
   const layers = [['radio', 'rgba(110,140,45,.20)', 'rgba(70,95,25,.75)'],
                   ['build', 'rgba(233,30,140,.26)', 'rgba(190,20,110,.65)']];
   for (const [kind, fill, edge] of layers){
-    if (kind === 'radio' ? !settings.showRadio : !settings.showBuild) continue;
+    if (kind === 'build' && !settings.showBuild) continue;
     for (const mk of markers){
       const r = radiusFor(mk)[kind]; if (!r) continue;
+      if (kind === 'radio' && !radioShown(mk.type)) continue;
       ctx.beginPath(); ctx.arc(M(mk.x), M(mk.y), M(r), 0, Math.PI * 2);
       ctx.fillStyle = fill; ctx.fill();
       ctx.strokeStyle = edge; ctx.lineWidth = 2; ctx.stroke();
@@ -673,6 +724,10 @@ $('#btnPng').addEventListener('click', () => {
       ctx.fillStyle = '#42591e';
       ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
       ctx.font = '24px system-ui,sans-serif'; ctx.fillText(CONFIG.relayGlyph, x, y + 1);
+    } else if (mk.type === 'supply'){
+      ctx.fillStyle = '#a0662c';
+      ctx.beginPath(); ctx.roundRect(x - 19, y - 19, 38, 38, 8); ctx.fill(); ctx.stroke();
+      ctx.font = '22px system-ui,sans-serif'; ctx.fillText('📦', x, y + 1);
     } else {
       ctx.fillStyle = '#3f8ecc';
       ctx.beginPath(); ctx.arc(x, y, 17, 0, Math.PI * 2); ctx.fill(); ctx.stroke();

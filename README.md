@@ -10,13 +10,18 @@ is uploaded).
 
 ## Features
 
-- Place up to **2 MOBs** (hard cap), unlimited **bases** and **radio relays**
-- Each MOB/base draws a green **radio coverage** circle and a pink **build zone** circle;
-  relays draw a wider radio-only circle
+- Place up to **2 MOBs** (hard cap), unlimited **bases**, **supply bases** and **radio relays**
+- MOBs/bases draw a green **radio coverage** circle and a pink **build zone** circle; relays
+  draw a radio-only circle; supply bases draw a smaller build-only circle
+- Radio circles **toggle per type** (MOB / base / relay), and every radius —
+  radio ranges and MOB/base/supply build zones — is individually adjustable
 - Drag markers to move, click to rename/delete; soft warning when two build zones overlap
 - **Measure tool** (drag for distance in metres), 1 km grid overlay, live coordinate readout
-- Pan / wheel-zoom / pinch-zoom; markers stay a constant screen size
-- Autosaves to localStorage; **export/import plans as JSON**, **export the map as PNG**
+- **Select** (default tool): drag the map to move around, drag markers, click one to edit;
+  wheel/pinch to zoom
+- Settings autosave in the browser — including on a downloaded copy of the file — and a
+  **↺ Reset settings** button restores the defaults
+- Autosaves the plan to localStorage; **export/import plans as JSON**, **export the map as PNG**
 - Installable as a PWA when hosted over HTTPS (custom icon does not apply from `file://`)
 
 ## Default ranges — adjust in Settings
@@ -29,7 +34,8 @@ so every radius is editable in the ⚙ Settings drawer:
 | Base radio range | 1,000 m | community guides |
 | Relay radio range | 2,000 m | community guides ("additional 2000 m of radio coverage") |
 | MOB radio range | 2,500 m | **estimate** — not published |
-| Build radius | 750 m | **estimate** — not published |
+| MOB / base build radius | 750 m | **estimate** — not published |
+| Supply base build radius | 300 m | **estimate** — no published figure at all |
 
 Sources: [XGamingServer Conflict guide](https://xgamingserver.com/blog/arma-reforger-conflict-mode-guide/),
 [XGamingServer radio guide](https://xgamingserver.com/blog/arma-reforger-radio-communications-guide/),
