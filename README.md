@@ -11,11 +11,13 @@ is uploaded).
 ## Features
 
 - Place up to **2 MOBs** (hard cap), unlimited **bases**, **supply bases** and **radio relays**
-- MOBs/bases draw a green **radio coverage** circle and a pink **build zone** circle; relays
-  draw a radio-only circle; supply bases draw a smaller build-only circle
-- Radio circles **toggle per type** (MOB / base / relay), and every radius —
-  radio ranges and MOB/base/supply build zones — is individually adjustable
-- Drag markers to move, click to rename/delete; soft warning when two build zones overlap
+- Each marker draws a green **radio coverage** circle and a pink **minimum base distance**
+  circle (the "con limit" spacing from `SCR_MinBaseDistanceConfig`); supply/source points
+  have no radio, so they show only the spacing ring
+- Radio circles **toggle per type** (MOB / base / relay), and every radius — radio ranges
+  and each type's min-distance — is individually adjustable
+- Drag markers to move, click to rename/delete; soft warning when two markers sit inside
+  each other's minimum distance
 - **Measure tool** (drag for distance in metres), 1 km grid overlay, live coordinate readout
 - **Select** (default tool): drag the map to move around, drag markers, click one to edit;
   wheel/pinch to zoom
@@ -26,22 +28,30 @@ is uploaded).
 
 ## Default ranges — adjust in Settings
 
-Bohemia doesn't publish official numbers and they vary by game version and server config,
-so every radius is editable in the ⚙ Settings drawer:
+Defaults come from a real Conflict server config; values vary by game version and server, so
+every radius is editable in the ⚙ Settings drawer.
+
+Radio coverage:
 
 | Setting | Default | Basis |
 |---|---|---|
-| Base radio range | 1,000 m | community guides |
-| Relay radio range | 2,000 m | community guides ("additional 2000 m of radio coverage") |
-| MOB radio range | 1,000 m | **estimate** — not published |
-| MOB / base build radius | 750 m | **estimate** — not published |
-| Supply base build radius | 300 m | **estimate** — no published figure at all |
+| Base radio range | 2,000 m | server config |
+| Relay radio range | 3,000 m | server config |
+| MOB radio range | 2,000 m | **estimate** — treated like a base |
 
-Sources: [XGamingServer Conflict guide](https://xgamingserver.com/blog/arma-reforger-conflict-mode-guide/),
-[XGamingServer radio guide](https://xgamingserver.com/blog/arma-reforger-radio-communications-guide/),
-[Steam Ultimate Beginners Guide](https://steamcommunity.com/sharedfiles/filedetails/?id=3402008832).
-If you have verified values from game files or your server config, plug them in — circles
-update live and the values persist.
+Minimum base distance — the "con limits" from `SCR_MinBaseDistanceConfig`:
+
+| Base type | Default | Basis |
+|---|---|---|
+| Base (`BASE`) | 850 m | server config |
+| Supply / source (`SOURCE_BASE`) | 450 m | server config |
+| Relay (`RELAY`) | 300 m | server config |
+| MOB spacing | 850 m | **estimate** — treated like a base |
+
+Radio coverage and minimum distance are two different mechanics: green shows how far a base
+projects radio; pink shows how close another base of that type may be placed. Supply/source
+points have no radio, so no green circle. If you have different values from your own server
+config, plug them in — circles update live and the values persist.
 
 ## Map calibration
 
