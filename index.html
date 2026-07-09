@@ -903,6 +903,10 @@ function updateMapUI(){
 }
 function onMapReady(){                               // image for curMapId is decoded and in <img>
   imgW = mapImg.naturalWidth; imgH = mapImg.naturalHeight;
+  if (!imgW || !imgH){                              // not decoded yet — defer until it is (no blank frame)
+    mapImg.addEventListener('load', onMapReady, { once: true });
+    return;
+  }
   m2px = imgW / curMap().widthM;
   rings.setAttribute('viewBox', `0 0 ${imgW} ${imgH}`);
   rings.setAttribute('width', imgW); rings.setAttribute('height', imgH);
@@ -911,10 +915,21 @@ function onMapReady(){                               // image for curMapId is de
   pendingView = null;
 }
 function showCurrentMap(){                           // ensure <img> shows curMapId, then render
-  if (loadedMapId === curMapId){ onMapReady(); return; }
+  if (loadedMapId === curMapId && mapImg.naturalWidth){ onMapReady(); return; }
   loadedMapId = curMapId;
-  mapImg.addEventListener('load', onMapReady, { once: true });
-  mapImg.src = curMap().src;
+  const src = curMap().src;
+  mapImg.onerror = () => toast(curMap().label + ' map image failed to load', true);
+  mapImg.src = src;
+  // decode() resolves only when the bitmap is ready to paint — this avoids a blank
+  // map on browsers that would otherwise render the swap before the image decodes.
+  // Fall back to the load event on older browsers or if decode() rejects.
+  if (mapImg.decode){
+    mapImg.decode().then(() => { if (loadedMapId === curMapId) onMapReady(); })
+                   .catch(() => { mapImg.addEventListener('load', onMapReady, { once: true });
+                                  if (mapImg.complete && mapImg.naturalWidth) onMapReady(); });
+  } else {
+    mapImg.addEventListener('load', onMapReady, { once: true });
+  }
 }
 function setMap(id){                                 // user switched maps
   if (!MAPS[id] || id === curMapId) return;
