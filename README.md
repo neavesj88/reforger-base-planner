@@ -1,8 +1,9 @@
 # Arma Reforger Base Placement Tool
 
-Plan MOB, base and radio-relay placement for **Conflict on Everon** — one self-contained
-`index.html` with the full topographic map embedded. No build, no server, no dependencies,
-no network: download the file, open it, plan. Works from `file://` and any static host.
+Plan MOB, base and radio-relay placement for **Conflict on Everon and Arland** — one
+self-contained `index.html` with both topographic maps embedded. No build, no server, no
+dependencies, no network: download the file, open it, plan. Works from `file://` and any
+static host.
 
 Sibling project to [lion-board](https://github.com/neavesj88/lion-board) and follows the
 same philosophy: single file, everything inlined, data local-only (localStorage — nothing
@@ -10,6 +11,8 @@ is uploaded).
 
 ## Features
 
+- **Two maps** — Everon (default) and Arland, switched from the header; each keeps its own
+  independent set of markers and its own saved view
 - Place up to **2 MOBs** (hard cap), unlimited **bases**, **supply bases** and **radio relays**
 - Each marker draws a green **radio coverage** circle and a pink **minimum base distance**
   circle (the "con limit" spacing from `SCR_MinBaseDistanceConfig`); supply/source points
@@ -23,7 +26,11 @@ is uploaded).
   wheel/pinch to zoom
 - Settings autosave in the browser — including on a downloaded copy of the file — and a
   **↺ Reset settings** button restores the defaults
-- Autosaves the plan to localStorage; **export/import plans as JSON**, **export the map as PNG**
+- Autosaves both maps' plans to localStorage; **export/import plans as JSON** (one file holds
+  both maps), **export the current map as PNG**
+- **Default layout file** — drop a `default.json` next to `index.html` on a web host and it
+  auto-loads on a fresh device; "Save as default" creates it. It never overwrites work already
+  saved in the browser, and auto-load is skipped safely on `file://` / phones (Import instead)
 - Installable as a PWA when hosted over HTTPS (custom icon does not apply from `file://`)
 
 ## Default ranges — adjust in Settings
@@ -55,15 +62,16 @@ config, plug them in — circles update live and the values persist.
 
 ## Map calibration
 
-The embedded image is a community topographic render of Everon ("Everon 1989",
-Bohemia Interactive terrain), cropped to its grid area and downscaled to 8192 px.
-The render's own 100 m grid was measured at 111.82 px per 100 m at source resolution,
-giving a rendered area of exactly **13,600 × 13,100 m** (the 12.8 × 12.8 km terrain plus
-sea padding). All in-app distances derive from that grid, so measurements match in-game
-distances.
+Both maps are community topographic renders (Bohemia Interactive terrains), each calibrated
+by measuring its own printed 100 m grid so in-app distances match in-game metres.
+
+- **Everon** — cropped to its grid area, downscaled to 8192 px; grid measured at 111.82 px /
+  100 m → rendered area **13,600 × 13,100 m** (the 12.8 × 12.8 km terrain plus sea padding).
+- **Arland** — cropped to a whole-grid square, downscaled to 4096 px; grid measured at
+  ~145 px / 100 m over 40 cells → **4,000 × 4,000 m** (~16 km²).
 
 ## Stack
 
 Vanilla HTML/CSS/JS · SVG overlay for range rings · DOM tokens with pointer events ·
 CSS-transform pan/zoom · canvas PNG export · localStorage · inline PWA manifest.
-One file, ~8 MB (the map is most of it).
+One file, ~10 MB (the two maps are most of it).
