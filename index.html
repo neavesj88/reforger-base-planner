@@ -11,6 +11,7 @@
   --bg:#131c26; --panel:#1b2734; --panel2:#223141; --ink:#e8eef4; --muted:#93a4b5;
   --line:#2e4155; --accent:#e8a21d; --danger:#e5564b;
   --radio-fill:rgba(110,140,45,.20); --radio-edge:rgba(70,95,25,.75);
+  --radio-relay-fill:rgba(45,110,175,.18); --radio-relay-edge:rgba(25,75,130,.70);
   --build-fill:rgba(233,30,140,.26); --build-edge:rgba(190,20,110,.65);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
@@ -34,6 +35,14 @@ header h1 small{color:var(--muted);font-weight:600}
 .tbtn .dot.point{background:#3f8ecc}
 .tbtn .dot.supply{border-radius:4px;background:#a0662c}
 .tbtn .dot.relay{background:#5a7d2a}
+.tbtn .dot.cp{background:#8d4bbf}
+/* generic type dots (filters + list rows) */
+.dot{width:11px;height:11px;border-radius:50%;flex:none}
+.dot.mob{border-radius:3px;background:#e8a21d}
+.dot.cp{background:#8d4bbf}
+.dot.point{background:#3f8ecc}
+.dot.supply{border-radius:4px;background:#a0662c}
+.dot.relay{background:#5a7d2a}
 .spacer{flex:1}
 .mapswitch{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:none}
 .mapswitch button{border:0;border-left:1px solid var(--line);background:var(--panel);color:var(--muted);
@@ -61,8 +70,10 @@ header h1 small{color:var(--muted);font-weight:600}
   box-shadow:0 0 0 2px #fff inset,0 1px 5px rgba(0,0,0,.5)}
 .token.relay .body{width:26px;height:26px;border-radius:50%;background:#42591e;font-size:14px}
 .token.supply .body{width:24px;height:24px;border-radius:6px;background:#a0662c;font-size:13px}
+.token.cp .body{width:32px;height:24px;border-radius:6px;background:#8d4bbf;font-size:11px;color:#fff;letter-spacing:.5px}
+.token .name .crd{display:block;font-size:9.5px;font-weight:700;color:#39485a}
 .token .name{font-size:11px;font-weight:700;color:#10161d;background:rgba(255,255,255,.82);
-  padding:1px 6px;border-radius:6px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+  padding:1px 6px;border-radius:6px;white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .token.sel .body{outline:3px solid #fff;outline-offset:1px}
 body.nolabels .token .name{display:none}
 
@@ -85,6 +96,7 @@ body.nolabels .token .name{display:none}
   padding:7px 9px;font-size:13px;width:100%}
 #popup .row{display:flex;gap:6px}
 #popup .row .tbtn{flex:1;justify-content:center}
+#popup .row input{flex:1;min-width:0;width:auto}
 #popup .meta{font-size:11px;color:var(--muted)}
 .tbtn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
 
@@ -102,6 +114,23 @@ body.nolabels .token .name{display:none}
 #drawer .tbtn{width:100%;justify-content:center;margin:4px 0}
 #drawer .note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}
 #drawer .note b{color:var(--ink)}
+
+/* ---------- bases list panel (left slide-out) ---------- */
+#listPanel{position:fixed;top:0;left:0;bottom:0;width:330px;max-width:92vw;z-index:50;background:var(--panel);
+  border-right:1px solid var(--line);padding:14px;transform:translateX(-105%);transition:transform .22s;
+  display:flex;flex-direction:column;gap:10px}
+#listPanel.show{transform:none}
+#listPanel h2{font-size:14px}
+.fltrow{display:flex;flex-wrap:wrap;gap:6px}
+.flt{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border:1px solid var(--line);
+  border-radius:8px;padding:4px 8px;cursor:pointer;background:var(--panel2)}
+.flt input{accent-color:var(--accent);width:15px;height:15px}
+#markerList{flex:1;overflow-y:auto;border-top:1px solid var(--line)}
+.lrow{display:flex;align-items:center;gap:8px;padding:7px 6px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12.5px}
+.lrow:hover{background:var(--panel2)}
+.lrow .lnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.lrow .lxy{margin-left:auto;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lempty{color:var(--muted);font-size:12px;padding:10px 4px}
 .scrim{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s}
 .scrim.show{opacity:1;pointer-events:auto}
 
@@ -129,7 +158,8 @@ body.nolabels .token .name{display:none}
   <div class="mapswitch" id="mapSwitch" role="group" aria-label="Map"></div>
   <div class="toolgrp" role="toolbar" aria-label="Tools">
     <button class="tbtn active" id="toolPan" data-tool="pan" title="Default mode — drag the map to move around, drag a marker to reposition it, tap a marker to rename or delete">☝ Select</button>
-    <button class="tbtn" id="toolMob" data-tool="mob" title="Place a Main Operating Base (max 2)"><span class="dot mob"></span>MOB</button>
+    <button class="tbtn" id="toolMob" data-tool="mob" title="Place a Main Operating Base"><span class="dot mob"></span>MOB</button>
+    <button class="tbtn" data-tool="cp" title="Place a control point"><span class="dot cp"></span>CP</button>
     <button class="tbtn" data-tool="point" title="Place a base / objective"><span class="dot point"></span>Base</button>
     <button class="tbtn" data-tool="supply" title="Place a supply base"><span class="dot supply"></span>Supply</button>
     <button class="tbtn" data-tool="relay" title="Place a radio relay"><span class="dot relay"></span>Relay</button>
@@ -137,6 +167,7 @@ body.nolabels .token .name{display:none}
   </div>
   <div class="spacer"></div>
   <div class="toolgrp">
+    <button class="tbtn" id="btnList" title="Bases list and type filters">☰ Bases</button>
     <button class="tbtn" id="btnFit" title="Fit map to screen">⤢ Fit</button>
     <button class="tbtn" id="btnSettings" title="Ranges and options">⚙ Settings</button>
   </div>
@@ -159,6 +190,10 @@ body.nolabels .token .name{display:none}
 <!-- marker popup: rename / delete the selected marker -->
 <div id="popup">
   <input id="popName" maxlength="40" placeholder="Name">
+  <div class="row">
+    <input type="number" id="popX" step="1" title="Game X (m)" placeholder="X">
+    <input type="number" id="popY" step="1" title="Game Y (m)" placeholder="Y">
+  </div>
   <div class="meta" id="popMeta"></div>
   <div class="row">
     <button class="tbtn danger" id="popDelete">Delete</button>
@@ -172,16 +207,19 @@ body.nolabels .token .name{display:none}
   <h3>Radio coverage (m · tick shows circle)</h3>
   <div class="field"><label for="setMobRadio">MOB radio</label><span class="ctl"><input type="number" id="setMobRadio" min="0" step="100"><input type="checkbox" id="setShowRadioMob" title="Show MOB radio circles"></span></div>
   <div class="field"><label for="setBaseRadio">Base radio</label><span class="ctl"><input type="number" id="setBaseRadio" min="0" step="100"><input type="checkbox" id="setShowRadioBase" title="Show base radio circles"></span></div>
+  <div class="field"><label for="setCpRadio">Control point radio</label><span class="ctl"><input type="number" id="setCpRadio" min="0" step="100"><input type="checkbox" id="setShowRadioCp" title="Show control point radio circles"></span></div>
   <div class="field"><label for="setRelayRadio">Relay radio</label><span class="ctl"><input type="number" id="setRelayRadio" min="0" step="100"><input type="checkbox" id="setShowRadioRelay" title="Show relay radio circles"></span></div>
   <h3>Min base distance (m · con limits)</h3>
   <div class="field"><label for="setMobBuild">MOB spacing</label><input type="number" id="setMobBuild" min="0" step="50"></div>
   <div class="field"><label for="setBaseBuild">Base spacing</label><input type="number" id="setBaseBuild" min="0" step="50"></div>
+  <div class="field"><label for="setCpBuild">Control point spacing</label><input type="number" id="setCpBuild" min="0" step="50"></div>
   <div class="field"><label for="setSupplyBuild">Supply (source) spacing</label><input type="number" id="setSupplyBuild" min="0" step="50"></div>
   <div class="field"><label for="setRelayBuild">Relay spacing</label><input type="number" id="setRelayBuild" min="0" step="50"></div>
   <h3>Display</h3>
   <div class="field"><label for="setShowBuild">Min-distance circles</label><input type="checkbox" id="setShowBuild"></div>
   <div class="field"><label for="setShowGrid">1 km grid</label><input type="checkbox" id="setShowGrid"></div>
   <div class="field"><label for="setShowLabels">Marker labels</label><input type="checkbox" id="setShowLabels"></div>
+  <div class="field"><label for="setShowCoords">Coordinates on tags</label><input type="checkbox" id="setShowCoords"></div>
   <h3>Plan (both maps)</h3>
   <button class="tbtn" id="btnPng">📷 Export PNG (current map)</button>
   <button class="tbtn" id="btnJsonOut">⇩ Export plan (JSON)</button>
@@ -208,6 +246,19 @@ body.nolabels .token .name{display:none}
     (~4 × 4 km), both on a 100 m grid. Everything is stored locally — nothing is uploaded.</p>
 </div>
 
+<div class="scrim" id="scrimList"></div>
+<div id="listPanel" aria-label="Bases list" role="dialog">
+  <h2>☰ Bases &amp; points</h2>
+  <div class="fltrow">
+    <label class="flt"><input type="checkbox" id="fltMob"><span class="dot mob"></span>MOB</label>
+    <label class="flt"><input type="checkbox" id="fltCp"><span class="dot cp"></span>CP</label>
+    <label class="flt"><input type="checkbox" id="fltPoint"><span class="dot point"></span>Base</label>
+    <label class="flt"><input type="checkbox" id="fltSupply"><span class="dot supply"></span>Supply</label>
+    <label class="flt"><input type="checkbox" id="fltRelay"><span class="dot relay"></span>Relay</label>
+  </div>
+  <div id="markerList"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div class="scrim" id="scrimConfirm"></div>
 <div class="confirmbox" id="confirmBox" role="alertdialog" aria-modal="true">
@@ -229,30 +280,38 @@ const ARLAND_B64 = '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAYEBQUFBAYFBQUHBgYHCQ8KCQgI
 /* Map registry. Everon's image is inlined in the <img> tag (default map); its src is
    captured on boot. Arland is embedded here and swapped in on demand. Dimensions were
    measured from each render's printed 100 m grid. */
+/* origin = where the game's (0,0) sits, in metres from the render's west/south edges.
+   Everon was calibrated against three known Reforger POI coordinates (Airport 4893,11800;
+   Chotain 7087,6011; Levie 7456,4737 — EnfusionMapMaker data): the three fits agreed to
+   ±10 m, mean (56, -20). Arland is an in-game map stitch, so its origin is exact. */
 const MAPS = {
-  everon: { label: 'Everon', widthM: 13600, heightM: 13100, src: null },
-  arland: { label: 'Arland', widthM: 4000,  heightM: 4000,  src: 'data:image/jpeg;base64,' + ARLAND_B64 }
+  everon: { label: 'Everon', widthM: 13600, heightM: 13100, origin: { x: 56, y: -20 }, src: null },
+  arland: { label: 'Arland', widthM: 4000,  heightM: 4000,  origin: { x: 0,  y: 0   }, src: 'data:image/jpeg;base64,' + ARLAND_B64 }
 };
 let curMapId = 'everon';
 const curMap = () => MAPS[curMapId];
 
 const CONFIG = {
-  types: {
-    mob:    { name: 'MOB',    max: 2,        build: true,  radio: true  },
-    point:  { name: 'Base',   max: Infinity, build: true,  radio: true  },
-    supply: { name: 'Supply', max: Infinity, build: true,  radio: false },
-    relay:  { name: 'Relay',  max: Infinity, build: true,  radio: true  }
+  types: {   // no MOB cap — scenarios ship several MOBs and only two get picked
+    mob:    { name: 'MOB',           max: Infinity, build: true,  radio: true  },
+    cp:     { name: 'Control Point', max: Infinity, build: true,  radio: true  },
+    point:  { name: 'Base',          max: Infinity, build: true,  radio: true  },
+    supply: { name: 'Supply',        max: Infinity, build: true,  radio: false },
+    relay:  { name: 'Relay',         max: Infinity, build: true,  radio: true  }
   },
   defaults: {                                      // metres — editable in Settings
     mobRadio: 2000,                                // estimate — treated like a base's radio
     baseRadio: 2000,                               // server config ("2000 for radio")
     relayRadio: 3000,                              // server config ("3000 for relays")
+    cpRadio: 2000,                                 // estimate — CPs are bases with radios
     mobBuild: 850,                                 // estimate — treated like BASE
     baseBuild: 850,                                // SCR_MinBaseDistanceConfig: BASE
+    cpBuild: 850,                                  // estimate — treated like BASE
     supplyBuild: 450,                              // SCR_MinBaseDistanceConfig: SOURCE_BASE
     relayBuild: 300,                               // SCR_MinBaseDistanceConfig: RELAY
-    showRadioMob: true, showRadioBase: true, showRadioRelay: true,
-    showBuild: true, showGrid: false, showLabels: true
+    showRadioMob: true, showRadioBase: true, showRadioRelay: true, showRadioCp: true,
+    showBuild: true, showGrid: false, showLabels: true, showCoords: true,
+    showTypeMob: true, showTypeCp: true, showTypePoint: true, showTypeSupply: true, showTypeRelay: true
   },
   zoomMax: 6, relayGlyph: '📡',
   lsPlan: 'rbp_plan', lsPrefs: 'rbp_prefs'
@@ -271,23 +330,24 @@ const SVGNS = 'http://www.w3.org/2000/svg';
 let markers = [];                                  // {id, type, x, y (metres from NW corner), name}
 let settings = Object.assign({}, CONFIG.defaults);
 let view = { tx: 0, ty: 0, s: 0.1 };               // world CSS transform
-let tool = 'pan', selId = null, nextId = 1, nextBaseNum = 1, nextSupplyNum = 1;
+let tool = 'pan', selId = null, nextId = 1, nextBaseNum = 1, nextSupplyNum = 1, nextCpNum = 1;
 let imgW = 0, imgH = 0, m2px = 1;                  // set each time the map loads
 let loadedMapId = null, pendingView = null;        // which image is in <img>; view to apply after load
 
-const newPlan = () => ({ markers: [], nextId: 1, nextBaseNum: 1, nextSupplyNum: 1, view: null });
+const newPlan = () => ({ markers: [], nextId: 1, nextBaseNum: 1, nextSupplyNum: 1, nextCpNum: 1, view: null });
 const plans = { everon: newPlan(), arland: newPlan() };
 function normalizePlan(o){
   return { markers: Array.isArray(o.markers) ? o.markers.filter(m => CONFIG.types[m.type] && isFinite(m.x) && isFinite(m.y)) : [],
            nextId: o.nextId || 1, nextBaseNum: o.nextBaseNum || 1, nextSupplyNum: o.nextSupplyNum || 1,
+           nextCpNum: o.nextCpNum || 1,
            view: (o.view && o.view.s) ? o.view : null };
 }
 function stashCurrent(){
-  plans[curMapId] = { markers, nextId, nextBaseNum, nextSupplyNum, view: { tx: view.tx, ty: view.ty, s: view.s } };
+  plans[curMapId] = { markers, nextId, nextBaseNum, nextSupplyNum, nextCpNum, view: { tx: view.tx, ty: view.ty, s: view.s } };
 }
 function unstash(){                                 // load plans[curMapId] into the working globals; returns its saved view
   const p = plans[curMapId] || (plans[curMapId] = newPlan());
-  markers = p.markers; nextId = p.nextId; nextBaseNum = p.nextBaseNum; nextSupplyNum = p.nextSupplyNum;
+  markers = p.markers; nextId = p.nextId; nextBaseNum = p.nextBaseNum; nextSupplyNum = p.nextSupplyNum; nextCpNum = p.nextCpNum || 1;
   return p.view;
 }
 
@@ -343,13 +403,28 @@ function drawScalebar(){
    ========================================================================= */
 function radiusFor(mk){
   const radio = mk.type === 'mob' ? settings.mobRadio : mk.type === 'relay' ? settings.relayRadio :
-                mk.type === 'point' ? settings.baseRadio : 0;
+                mk.type === 'point' ? settings.baseRadio : mk.type === 'cp' ? settings.cpRadio : 0;
   const build = mk.type === 'mob' ? settings.mobBuild : mk.type === 'point' ? settings.baseBuild :
-                mk.type === 'supply' ? settings.supplyBuild : settings.relayBuild;
+                mk.type === 'cp' ? settings.cpBuild : mk.type === 'supply' ? settings.supplyBuild : settings.relayBuild;
   return { radio, build };
 }
 function radioShown(type){
-  return type === 'mob' ? settings.showRadioMob : type === 'relay' ? settings.showRadioRelay : settings.showRadioBase;
+  return type === 'mob' ? settings.showRadioMob : type === 'relay' ? settings.showRadioRelay :
+         type === 'cp' ? settings.showRadioCp : settings.showRadioBase;
+}
+/* type visibility filters (the ☰ Bases panel) */
+const TYPE_FLAG = { mob: 'showTypeMob', cp: 'showTypeCp', point: 'showTypePoint', supply: 'showTypeSupply', relay: 'showTypeRelay' };
+const FLT_ID   = { mob: 'fltMob',      cp: 'fltCp',      point: 'fltPoint',      supply: 'fltSupply',      relay: 'fltRelay' };
+function typeShown(type){ return settings[TYPE_FLAG[type]] !== false; }
+/* game coordinates: X east / Y north from the terrain's (0,0), via the map's calibrated origin */
+function gameXY(mk){
+  const o = curMap().origin;
+  return { x: mk.x - o.x, y: (curMap().heightM - mk.y) - o.y };
+}
+function setFromGameXY(mk, gx, gy){
+  const o = curMap().origin;
+  mk.x = Math.min(Math.max(gx + o.x, 0), curMap().widthM);
+  mk.y = Math.min(Math.max(curMap().heightM - (gy + o.y), 0), curMap().heightM);
 }
 function makeCircle(cls, fill, edge){
   const c = document.createElementNS(SVGNS, 'circle');
@@ -361,31 +436,40 @@ function makeCircle(cls, fill, edge){
 function buildMarkerNodes(mk){
   const g = document.createElementNS(SVGNS, 'g');
   g.dataset.id = mk.id;
-  if (CONFIG.types[mk.type].radio) g.appendChild(makeCircle('radio', 'var(--radio-fill)', 'var(--radio-edge)'));
+  const relay = mk.type === 'relay';   // relay coverage reads blue so it stands apart from base radio
+  if (CONFIG.types[mk.type].radio)
+    g.appendChild(makeCircle('radio', relay ? 'var(--radio-relay-fill)' : 'var(--radio-fill)',
+                                      relay ? 'var(--radio-relay-edge)' : 'var(--radio-edge)'));
   if (CONFIG.types[mk.type].build) g.appendChild(makeCircle('build', 'var(--build-fill)', 'var(--build-edge)'));
   ringsG.appendChild(g);
 
   const t = document.createElement('div');
   t.className = 'token ' + mk.type;
   t.dataset.id = mk.id;
-  t.innerHTML = `<div class="body">${mk.type === 'mob' ? 'MOB' : mk.type === 'relay' ? CONFIG.relayGlyph : mk.type === 'supply' ? '📦' : ''}</div><div class="name"></div>`;
+  t.innerHTML = `<div class="body">${mk.type === 'mob' ? 'MOB' : mk.type === 'cp' ? 'CP' : mk.type === 'relay' ? CONFIG.relayGlyph : mk.type === 'supply' ? '📦' : ''}</div><div class="name"><span class="nm"></span><span class="crd"></span></div>`;
   tokensDiv.appendChild(t);
 }
 function updateMarker(mk){
   const g = ringsG.querySelector(`g[data-id="${mk.id}"]`), t = tokensDiv.querySelector(`.token[data-id="${mk.id}"]`);
   if (!g || !t) return;
+  const vis = typeShown(mk.type);                  // type filter hides the marker and all its circles
   const cx = mx2px(mk.x), cy = mx2px(mk.y), r = radiusFor(mk);
   for (const c of g.children){
     c.setAttribute('cx', cx); c.setAttribute('cy', cy);
     const isRadio = c.classList.contains('radio');
     c.setAttribute('r', mx2px(isRadio ? r.radio : r.build));
-    c.style.display = (isRadio ? radioShown(mk.type) && r.radio > 0 : settings.showBuild && r.build > 0) ? '' : 'none';
+    c.style.display = (vis && (isRadio ? radioShown(mk.type) && r.radio > 0 : settings.showBuild && r.build > 0)) ? '' : 'none';
   }
+  t.style.display = vis ? '' : 'none';
   t.style.left = cx + 'px'; t.style.top = cy + 'px';
-  const nameEl = t.querySelector('.name');
-  nameEl.textContent = mk.name;
-  // the MOB body already reads "MOB" — only show the pill for custom names
-  nameEl.style.display = (!mk.name || (mk.type === 'mob' && mk.name === 'MOB')) ? 'none' : '';
+  const nm = t.querySelector('.nm'), crd = t.querySelector('.crd');
+  nm.textContent = mk.name;
+  // the MOB/CP body already reads its type — only show the pill name for custom names
+  nm.style.display = (!mk.name || (mk.type === 'mob' && mk.name === 'MOB')) ? 'none' : '';
+  const gc = gameXY(mk);
+  crd.textContent = `X ${Math.round(gc.x)} · Y ${Math.round(gc.y)}`;
+  crd.style.display = settings.showCoords ? '' : 'none';
+  t.querySelector('.name').style.display = (nm.style.display === 'none' && crd.style.display === 'none') ? 'none' : '';
   t.classList.toggle('sel', mk.id === selId);
 }
 function renderAll(){
@@ -393,6 +477,7 @@ function renderAll(){
   for (const mk of markers){ buildMarkerNodes(mk); updateMarker(mk); }
   document.body.classList.toggle('nolabels', !settings.showLabels);
   drawGrid();
+  renderList();
 }
 function drawGrid(){
   gridG.textContent = '';
@@ -424,8 +509,15 @@ function addMarker(type, x, y){
   }
   x = Math.min(Math.max(x, 0), curMap().widthM);
   y = Math.min(Math.max(y, 0), curMap().heightM);
+  // placing a filtered-off type would be invisible — switch its filter back on
+  if (!typeShown(type)){
+    settings[TYPE_FLAG[type]] = true;
+    const cb = $('#' + FLT_ID[type]); if (cb) cb.checked = true;
+    savePrefsSoon();
+  }
   const mk = { id: nextId++, type, x, y,
     name: type === 'mob' ? 'MOB' : type === 'relay' ? 'Relay' :
+          type === 'cp' ? 'CP ' + nextCpNum++ :
           type === 'supply' ? 'Supply ' + nextSupplyNum++ : 'Base ' + nextBaseNum++ };
   markers.push(mk);
   buildMarkerNodes(mk); updateMarker(mk);
@@ -490,8 +582,10 @@ stage.addEventListener('pointerdown', e => {
 stage.addEventListener('pointermove', e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   const p = screen2map(e.clientX, e.clientY);
-  if (p.x >= 0 && p.y >= 0 && p.x <= curMap().widthM && p.y <= curMap().heightM)
-    $('#coords').textContent = `E ${Math.round(p.x).toLocaleString()} m · N ${Math.round(curMap().heightM - p.y).toLocaleString()} m`;
+  if (p.x >= 0 && p.y >= 0 && p.x <= curMap().widthM && p.y <= curMap().heightM){
+    const o = curMap().origin;
+    $('#coords').textContent = `X ${Math.round(p.x - o.x).toLocaleString()} · Y ${Math.round((curMap().heightM - p.y) - o.y).toLocaleString()}`;
+  }
   if (!gesture) return;
   if (gesture.mode === 'pinch' && pointers.size === 2){
     const [p1, p2] = [...pointers.values()];
@@ -529,9 +623,7 @@ function endPointer(e){
   } else if (gesture.mode === 'maybe-place' && !gesture.moved){
     const p = screen2map(e.clientX, e.clientY);
     if (p.x >= 0 && p.y >= 0 && p.x <= curMap().widthM && p.y <= curMap().heightM){
-      const mk = addMarker(tool, p.x, p.y);
-      // auto-return to pan once both MOBs are down
-      if (mk && tool === 'mob' && markers.filter(m => m.type === 'mob').length >= CONFIG.types.mob.max) setTool('pan');
+      addMarker(tool, p.x, p.y);
     }
   }
   gesture = null;
@@ -570,7 +662,8 @@ function setTool(t){
   document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === t));
   stage.classList.toggle('placing', t !== 'pan');
   if (t !== 'measure'){ measure = null; drawMeasure(); }
-  if (t === 'mob') toast('Tap the map to place a MOB (max 2)');
+  if (t === 'mob') toast('Tap the map to place MOBs — Esc when done');
+  else if (t === 'cp') toast('Tap the map to place control points — Esc when done');
   else if (t === 'point') toast('Tap the map to place bases — Esc when done');
   else if (t === 'supply') toast('Tap the map to place supply bases — Esc when done');
   else if (t === 'relay') toast('Tap the map to place radio relays — Esc when done');
@@ -582,6 +675,8 @@ function selectMarker(mk, sx, sy){
   selId = mk.id; updateMarker(mk);
   const pop = $('#popup');
   $('#popName').value = mk.name;
+  const gc = gameXY(mk);
+  $('#popX').value = Math.round(gc.x); $('#popY').value = Math.round(gc.y);
   const r = radiusFor(mk), bits = [];
   if (r.radio) bits.push(`radio ${r.radio.toLocaleString()} m`);
   if (r.build) bits.push(`build ${r.build.toLocaleString()} m`);
@@ -599,6 +694,19 @@ $('#popName').addEventListener('input', () => {
   const mk = markers.find(m => m.id === selId);
   if (mk){ mk.name = $('#popName').value || CONFIG.types[mk.type].name; updateMarker(mk); savePlan(); }
 });
+/* exact placement: type in-game X/Y and the marker moves there */
+for (const id of ['popX', 'popY']){
+  $('#' + id).addEventListener('input', () => {
+    const mk = markers.find(m => m.id === selId); if (!mk) return;
+    const gx = +$('#popX').value, gy = +$('#popY').value;
+    if (!isFinite(gx) || !isFinite(gy)) return;
+    setFromGameXY(mk, gx, gy);
+    updateMarker(mk); savePlan();
+  });
+  $('#' + id).addEventListener('change', () => {
+    const mk = markers.find(m => m.id === selId); if (mk) checkSpacing(mk);
+  });
+}
 $('#popDelete').addEventListener('click', () => { if (selId !== null) deleteMarker(selId); });
 $('#popClose').addEventListener('click', closePopup);
 
@@ -606,18 +714,55 @@ $('#btnFit').addEventListener('click', fitView);
 $('#btnSettings').addEventListener('click', () => { $('#drawer').classList.add('show'); $('#scrimDrawer').classList.add('show'); });
 $('#scrimDrawer').addEventListener('click', () => { $('#drawer').classList.remove('show'); $('#scrimDrawer').classList.remove('show'); });
 
+/* ---------- bases list panel: type filters + all markers with game coords ---------- */
+const TYPE_ORDER = ['mob', 'cp', 'point', 'supply', 'relay'];
+function renderList(){
+  const box = $('#markerList'); if (!box) return;
+  box.textContent = '';
+  let shown = 0;
+  for (const ty of TYPE_ORDER){
+    if (!typeShown(ty)) continue;
+    for (const mk of markers.filter(m => m.type === ty)){
+      const row = document.createElement('div'); row.className = 'lrow';
+      const dot = document.createElement('span'); dot.className = 'dot ' + ty;
+      const nm = document.createElement('span'); nm.className = 'lnm'; nm.textContent = mk.name;
+      const xy = document.createElement('span'); xy.className = 'lxy';
+      const gc = gameXY(mk);
+      xy.textContent = `X ${Math.round(gc.x).toLocaleString()} · Y ${Math.round(gc.y).toLocaleString()}`;
+      row.append(dot, nm, xy);
+      row.addEventListener('click', () => { closeList(); centerOn(mk); });
+      box.appendChild(row); shown++;
+    }
+  }
+  if (!shown){
+    const e = document.createElement('div'); e.className = 'lempty';
+    e.textContent = markers.length ? 'All types filtered off' : 'No markers on ' + curMap().label + ' yet';
+    box.appendChild(e);
+  }
+}
+function centerOn(mk){
+  view.tx = stage.clientWidth / 2 - mx2px(mk.x) * view.s;
+  view.ty = stage.clientHeight / 2 - mx2px(mk.y) * view.s;
+  applyView();
+  selectMarker(mk, stage.clientWidth / 2, stage.clientHeight / 2);
+}
+function closeList(){ $('#listPanel').classList.remove('show'); $('#scrimList').classList.remove('show'); }
+$('#btnList').addEventListener('click', () => { renderList(); $('#listPanel').classList.add('show'); $('#scrimList').classList.add('show'); });
+$('#scrimList').addEventListener('click', closeList);
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape'){ setTool('pan'); closePopup();
+  if (e.key === 'Escape'){ setTool('pan'); closePopup(); closeList();
     $('#drawer').classList.remove('show'); $('#scrimDrawer').classList.remove('show'); closeConfirm(); }
   if ((e.key === 'Delete' || e.key === 'Backspace') && selId !== null && document.activeElement.tagName !== 'INPUT')
     deleteMarker(selId);
 });
 
 /* ---------- settings wiring: input id -> settings key ---------- */
-const settingMap = { setMobRadio: 'mobRadio', setBaseRadio: 'baseRadio', setRelayRadio: 'relayRadio',
-                     setMobBuild: 'mobBuild', setBaseBuild: 'baseBuild', setSupplyBuild: 'supplyBuild', setRelayBuild: 'relayBuild',
-                     setShowRadioMob: 'showRadioMob', setShowRadioBase: 'showRadioBase', setShowRadioRelay: 'showRadioRelay',
-                     setShowBuild: 'showBuild', setShowGrid: 'showGrid', setShowLabels: 'showLabels' };
+const settingMap = { setMobRadio: 'mobRadio', setBaseRadio: 'baseRadio', setRelayRadio: 'relayRadio', setCpRadio: 'cpRadio',
+                     setMobBuild: 'mobBuild', setBaseBuild: 'baseBuild', setCpBuild: 'cpBuild', setSupplyBuild: 'supplyBuild', setRelayBuild: 'relayBuild',
+                     setShowRadioMob: 'showRadioMob', setShowRadioBase: 'showRadioBase', setShowRadioRelay: 'showRadioRelay', setShowRadioCp: 'showRadioCp',
+                     setShowBuild: 'showBuild', setShowGrid: 'showGrid', setShowLabels: 'showLabels', setShowCoords: 'showCoords',
+                     fltMob: 'showTypeMob', fltCp: 'showTypeCp', fltPoint: 'showTypePoint', fltSupply: 'showTypeSupply', fltRelay: 'showTypeRelay' };
 function loadSettingsUI(){
   for (const [id, key] of Object.entries(settingMap)){
     const el = $('#' + id);
@@ -630,6 +775,7 @@ for (const [id, key] of Object.entries(settingMap)){
     document.body.classList.toggle('nolabels', !settings.showLabels);
     drawGrid();
     for (const mk of markers) updateMarker(mk);
+    renderList();
     savePrefsSoon();
   });
 }
@@ -659,7 +805,7 @@ $('#scrimConfirm').addEventListener('click', closeConfirm);
 
 $('#btnClear').addEventListener('click', () =>
   askConfirm('Remove all markers from the map?', 'Clear all', () => {
-    markers = []; nextBaseNum = 1; nextSupplyNum = 1; renderAll(); savePlan(); toast('Plan cleared');
+    markers = []; nextBaseNum = 1; nextSupplyNum = 1; nextCpNum = 1; renderAll(); savePlan(); toast('Plan cleared');
   }));
 $('#btnResetSet').addEventListener('click', () => {
   settings = Object.assign({}, CONFIG.defaults);
@@ -667,6 +813,7 @@ $('#btnResetSet').addEventListener('click', () => {
   document.body.classList.toggle('nolabels', !settings.showLabels);
   drawGrid();
   for (const mk of markers) updateMarker(mk);
+  renderList();
   savePrefsSoon();
   toast('Settings reset to defaults');
 });
@@ -679,6 +826,7 @@ function lsSet(key, val){ try{ localStorage.setItem(key, val); }catch(e){ /* pri
 function savePlan(){
   stashCurrent();
   lsSet(CONFIG.lsPlan, JSON.stringify({ v: 2, curMapId, plans }));
+  renderList();
 }
 function saveViewSoon(){ clearTimeout(viewSaveT); viewSaveT = setTimeout(savePlan, 400); }
 /* older saves used one shared buildRadius and a single radio toggle — spread them
@@ -814,26 +962,32 @@ $('#btnPng').addEventListener('click', () => {
     for (let m = 0; m <= curMap().widthM; m += 1000){ ctx.beginPath(); ctx.moveTo(M(m), 0); ctx.lineTo(M(m), ch); ctx.stroke(); }
     for (let m = 0; m <= curMap().heightM; m += 1000){ ctx.beginPath(); ctx.moveTo(0, M(m)); ctx.lineTo(cw, M(m)); ctx.stroke(); }
   }
+  const visible = markers.filter(mk => typeShown(mk.type));   // export honours the type filters
   const layers = [['radio', 'rgba(110,140,45,.20)', 'rgba(70,95,25,.75)'],
                   ['build', 'rgba(233,30,140,.26)', 'rgba(190,20,110,.65)']];
   for (const [kind, fill, edge] of layers){
     if (kind === 'build' && !settings.showBuild) continue;
-    for (const mk of markers){
+    for (const mk of visible){
       const r = radiusFor(mk)[kind]; if (!r) continue;
       if (kind === 'radio' && !radioShown(mk.type)) continue;
+      const relay = kind === 'radio' && mk.type === 'relay';
       ctx.beginPath(); ctx.arc(M(mk.x), M(mk.y), M(r), 0, Math.PI * 2);
-      ctx.fillStyle = fill; ctx.fill();
-      ctx.strokeStyle = edge; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = relay ? 'rgba(45,110,175,.18)' : fill; ctx.fill();
+      ctx.strokeStyle = relay ? 'rgba(25,75,130,.70)' : edge; ctx.lineWidth = 2; ctx.stroke();
     }
   }
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  for (const mk of markers){
+  for (const mk of visible){
     const x = M(mk.x), y = M(mk.y);
     ctx.strokeStyle = '#10161d'; ctx.lineWidth = 3;
     if (mk.type === 'mob'){
       ctx.fillStyle = '#e8a21d';
       ctx.beginPath(); ctx.roundRect(x - 34, y - 22, 68, 44, 9); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#10161d'; ctx.font = '800 22px system-ui,sans-serif'; ctx.fillText('MOB', x, y + 1);
+    } else if (mk.type === 'cp'){
+      ctx.fillStyle = '#8d4bbf';
+      ctx.beginPath(); ctx.roundRect(x - 28, y - 20, 56, 40, 8); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = '800 20px system-ui,sans-serif'; ctx.fillText('CP', x, y + 1);
     } else if (mk.type === 'relay'){
       ctx.fillStyle = '#42591e';
       ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
@@ -848,12 +1002,22 @@ $('#btnPng').addEventListener('click', () => {
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI * 2); ctx.stroke();
     }
-    if (settings.showLabels && mk.name && !(mk.type === 'mob' && mk.name === 'MOB')){
-      ctx.font = '700 20px system-ui,sans-serif';
-      const tw = ctx.measureText(mk.name).width;
-      ctx.fillStyle = 'rgba(255,255,255,.85)';
-      ctx.beginPath(); ctx.roundRect(x - tw / 2 - 8, y + 26, tw + 16, 28, 7); ctx.fill();
-      ctx.fillStyle = '#10161d'; ctx.fillText(mk.name, x, y + 41);
+    if (settings.showLabels){
+      const lines = [];
+      if (mk.name && !(mk.type === 'mob' && mk.name === 'MOB')) lines.push(['700 20px system-ui,sans-serif', mk.name]);
+      if (settings.showCoords){
+        const gc = gameXY(mk);
+        lines.push(['700 16px system-ui,sans-serif', `X ${Math.round(gc.x)} · Y ${Math.round(gc.y)}`]);
+      }
+      let ly = y + 26;
+      for (const [font, text] of lines){
+        ctx.font = font;
+        const tw = ctx.measureText(text).width;
+        ctx.fillStyle = 'rgba(255,255,255,.85)';
+        ctx.beginPath(); ctx.roundRect(x - tw / 2 - 8, ly, tw + 16, 26, 7); ctx.fill();
+        ctx.fillStyle = '#10161d'; ctx.fillText(text, x, ly + 14);
+        ly += 30;
+      }
     }
   }
   // scale bar (1 km) bottom-left

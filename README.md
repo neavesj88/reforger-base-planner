@@ -13,12 +13,17 @@ is uploaded).
 
 - **Two maps** — Everon (default) and Arland, switched from the header; each keeps its own
   independent set of markers and its own saved view
-- Place up to **2 MOBs** (hard cap), unlimited **bases**, **supply bases** and **radio relays**
-- Each marker draws a green **radio coverage** circle and a pink **minimum base distance**
-  circle (the "con limit" spacing from `SCR_MinBaseDistanceConfig`); supply/source points
-  have no radio, so they show only the spacing ring
-- Radio circles **toggle per type** (MOB / base / relay), and every radius — radio ranges
-  and each type's min-distance — is individually adjustable
+- Place unlimited **MOBs**, **control points**, **bases**, **supply bases** and **radio
+  relays** (no MOB cap — scenarios ship several and only two get picked)
+- Each marker draws a **radio coverage** circle (green; **blue for relays** so they stand
+  apart) and a pink **minimum base distance** circle (the "con limit" spacing from
+  `SCR_MinBaseDistanceConfig`); supply/source points have no radio, so only the spacing ring
+- Radio circles **toggle per type** (MOB / CP / base / relay), and every radius — radio
+  ranges and each type's min-distance — is individually adjustable
+- **☰ Bases panel** — slides out with per-type visibility filters (e.g. show only MOBs +
+  CPs) and a live list of every marker with its game coordinates; click a row to jump to it
+- **Game coordinates (X/Y metres)** on every marker tag, in the list, and under the cursor;
+  select a marker and type exact X/Y to place it precisely
 - Drag markers to move, click to rename/delete; soft warning when two markers sit inside
   each other's minimum distance
 - **Measure tool** (drag for distance in metres), 1 km grid overlay, live coordinate readout
@@ -69,6 +74,14 @@ by measuring its own printed 100 m grid so in-app distances match in-game metres
   100 m → rendered area **13,600 × 13,100 m** (the 12.8 × 12.8 km terrain plus sea padding).
 - **Arland** — cropped to a whole-grid square, downscaled to 4096 px; grid measured at
   ~145 px / 100 m over 40 cells → **4,000 × 4,000 m** (~16 km²).
+
+Game-coordinate origins (where the terrain's 0,0 sits in each render) are calibrated in
+`MAPS` in the source. Arland is an in-game map stitch, so its origin is exact. Everon's
+render was fitted against three known Reforger POI coordinates (Airport 4893,11800 ·
+Chotain 7087,6011 · Levie 7456,4737, from EnfusionMapMaker data); the three independent
+fits agreed within ±10 m, giving origin (56, −20). Relative distances are exact (±3 m);
+absolute coordinates on Everon are good to roughly ±25 m — if you measure a precise
+in-game position that disagrees, adjust the two origin numbers and everything shifts.
 
 ## Stack
 
