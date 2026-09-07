@@ -1,9 +1,9 @@
 # Arma Reforger Base Placement Tool
 
-Plan MOB, base and radio-relay placement for **Conflict on Everon and Arland** — one
-self-contained `index.html` with both topographic maps embedded. No build, no server, no
-dependencies, no network: download the file, open it, plan. Works from `file://` and any
-static host.
+Plan MOB, base and radio-relay placement for **Conflict on Everon, Arland and Kolguyev** —
+one self-contained `index.html` with all three topographic maps embedded. No build, no
+server, no dependencies, no network: download the file, open it, plan. Works from `file://`
+and any static host.
 
 Sibling project to [lion-board](https://github.com/neavesj88/lion-board) and follows the
 same philosophy: single file, everything inlined, data local-only (localStorage — nothing
@@ -11,8 +11,8 @@ is uploaded).
 
 ## Features
 
-- **Two maps** — Everon (default) and Arland, switched from the header; each keeps its own
-  independent set of markers and its own saved view
+- **Three maps** — Everon (default), Arland and Kolguyev, switched from the header; each
+  keeps its own independent set of markers and its own saved view
 - Place unlimited **MOBs**, **control points**, **bases**, **supply bases** and **radio
   relays** (no MOB cap — scenarios ship several and only two get picked)
 - Each marker draws a **radio coverage** circle (green; **blue for relays** so they stand
@@ -74,6 +74,12 @@ by measuring its own printed 100 m grid so in-app distances match in-game metres
   100 m → rendered area **13,600 × 13,100 m** (the 12.8 × 12.8 km terrain plus sea padding).
 - **Arland** — cropped to a whole-grid square, downscaled to 4096 px; grid measured at
   ~145 px / 100 m over 40 cells → **4,000 × 4,000 m** (~16 km²).
+- **Kolguyev** — stitched from iZurvive's topographic tile pyramid (zoom 5, 32 × 32 tiles =
+  8192 px). iZurvive's map config bounds the tile square to exactly 0–12,800 m on both
+  axes with full coverage, so the image edge *is* the terrain edge: **12,800 × 12,800 m**
+  and a (0,0) origin. This is taken from iZurvive's coordinate config (the same one their
+  GPS lookup uses), not yet cross-checked against an in-game POI — the tiles carry no
+  printed grid to measure. If an in-game position disagrees, adjust the origin in `MAPS`.
 
 Game-coordinate origins (where the terrain's 0,0 sits in each render) are calibrated in
 `MAPS` in the source. Arland is an in-game map stitch, so its origin is exact. Everon's
@@ -87,4 +93,4 @@ in-game position that disagrees, adjust the two origin numbers and everything sh
 
 Vanilla HTML/CSS/JS · SVG overlay for range rings · DOM tokens with pointer events ·
 CSS-transform pan/zoom · canvas PNG export · localStorage · inline PWA manifest.
-One file, ~10 MB (the two maps are most of it).
+One file, ~16 MB (the three maps are most of it).
